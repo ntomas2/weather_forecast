@@ -110,21 +110,26 @@ pytest test_api.py -v
 
 ```
 weather_forecast/
-├── src/
-│   ├── __init__.py
-│   ├── main.py
-│   ├── requirements.txt
-│   ├── test_api.py
-│   ├── app
-│   │   ├── index.html
-│   │   ├── styles.css
-│   │   └── scripts.js
-│   └── static/
-│       ├── index.html
-│       ├── styles.css
-│       └── scripts.js
-├── docker-compose.yaml
-└── README.md
+┣ 📂src
+┃ ┣ 📂app
+┃ ┃ ┣ 📂routers
+┃ ┃ ┃ ┣ 📜__init__.py
+┃ ┃ ┃ ┗ 📜weather.py
+┃ ┃ ┣ 📜__init__.py
+┃ ┃ ┗ 📜schemas.py
+┃ ┣ 📂static
+┃ ┃ ┣ 📜index.html
+┃ ┃ ┣ 📜scripts.js
+┃ ┃ ┗ 📜styles.css
+┃ ┣ 📜__init__.py
+┃ ┣ 📜Dockerfile
+┃ ┣ 📜main.py
+┃ ┣ 📜requirements.txt
+┃ ┗ 📜test_api.py
+┣ 📂venv
+┣ 📜.gitignore
+┣ 📜docker-compose.yaml
+┗ 📜README.md
 ```
 
 ## API endpoints
