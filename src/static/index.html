@@ -51,5 +51,10 @@
         </div>
 
         <script src="/static/scripts.js"></script>
+        <script>
+            if (!window.localStorage) {
+                console.warn("Ваш браузер не поддерживает localStorage");
+            }
+        </script>
     </body>
 </html>

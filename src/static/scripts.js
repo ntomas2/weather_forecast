@@ -50,6 +50,100 @@ cityInput.addEventListener("input", handleCityInput);
 searchBtn.addEventListener("click", fetchWeather);
 document.addEventListener("click", handleDocumentClick);
 
+// LocalStorage keys
+const LAST_CITY_KEY = "lastCity";
+const CITY_HISTORY_KEY = "cityHistory";
+const MAX_HISTORY_ITEMS = 5;
+
+// При загрузке страницы
+document.addEventListener("DOMContentLoaded", () => {
+    loadLastCity();
+    setupCityHistory();
+});
+
+// Загрузить последний просмотренный город
+function loadLastCity() {
+    const lastCity = localStorage.getItem(LAST_CITY_KEY);
+    if (lastCity) {
+        // cityInput.value = lastCity;
+        showRecentCityPrompt(lastCity);
+    }
+}
+
+// Показать подсказку с последним городом
+function showRecentCityPrompt(cityName) {
+    const promptContainer = document.createElement("div");
+    promptContainer.className = "recent-city-prompt";
+    promptContainer.innerHTML = `
+        <p>Смотреть снова погоду в ${cityName}?</p>
+        <button id="recent-city-btn">Да</button>
+    `;
+
+    document.querySelector(".container").prepend(promptContainer);
+
+    document
+        .getElementById("recent-city-btn")
+        .addEventListener("click", () => {
+            cityInput.value = cityName;
+            fetchWeather();
+            promptContainer.remove();
+        });
+}
+
+// Сохранить город в историю
+function saveCityToHistory(cityData) {
+    localStorage.setItem(LAST_CITY_KEY, cityData.full_name);
+
+    let history = JSON.parse(localStorage.getItem(CITY_HISTORY_KEY)) || [];
+    history = history.filter((item) => item.full_name !== cityData.full_name);
+    history.unshift({
+        name: cityData.name,
+        region: cityData.region,
+        country: cityData.country,
+        full_name: cityData.full_name,
+        timestamp: new Date().toISOString(),
+    });
+
+    if (history.length > MAX_HISTORY_ITEMS) {
+        history = history.slice(0, MAX_HISTORY_ITEMS);
+    }
+
+    localStorage.setItem(CITY_HISTORY_KEY, JSON.stringify(history));
+}
+
+// Настроить историю городов
+function setupCityHistory() {
+    const history = JSON.parse(localStorage.getItem(CITY_HISTORY_KEY)) || [];
+    if (history.length === 0) return;
+
+    const historyContainer = document.createElement("div");
+    historyContainer.className = "city-history";
+    historyContainer.innerHTML = `
+        <h3>Недавние города:</h3>
+        <ul class="history-list"></ul>
+    `;
+
+    document.querySelector(".container").appendChild(historyContainer);
+
+    const list = historyContainer.querySelector(".history-list");
+
+    history.forEach((city) => {
+        const item = document.createElement("li");
+        item.className = "history-item";
+        item.innerHTML = `
+            <span>${city.name}${city.region ? ", " + city.region : ""}</span>
+            <button class="history-btn">Выбрать</button>
+        `;
+
+        item.querySelector(".history-btn").addEventListener("click", () => {
+            cityInput.value = city.full_name;
+            fetchWeather();
+        });
+
+        list.appendChild(item);
+    });
+}
+
 // Handle city input with debounce
 function handleCityInput(e) {
     clearTimeout(debounceTimer);
@@ -161,6 +255,15 @@ async function fetchWeather() {
 // Display weather data
 function displayWeather(data) {
     const { location, weather } = data;
+
+    saveCityToHistory({
+        name: location.name,
+        region: location.region,
+        country: location.country,
+        full_name: `${location.name}${
+            location.region ? ", " + location.region : ""
+        }${location.country ? ", " + location.country : ""}`,
+    });
 
     // Set city name
     cityNameElement.textContent = `${location.name}${
