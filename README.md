@@ -91,6 +91,13 @@ uvicorn src.main:app --reload
 http://localhost:8000
 ```
 
+3. Запуск через docker compose:
+
+```
+docker compose -f docker-compose.yaml up -d --build
+http://localhost:8000
+```
+
 ### Запуск тестов
 
 1. Установите тестовые зависимости:
